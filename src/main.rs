@@ -1,22 +1,63 @@
 use core::panic;
 use std::process::exit;
-
-const OFFSET: u32 = 2;
+use std::ops::{AddAssign, Add, Sub, Mul};
 
 #[derive(Debug)]
-enum StackFrame {
-    Token(String),
+enum Token {
+    Chars(String),
     Num(u32)
 }
 
+impl AddAssign<u32> for Token {
+    fn add_assign(&mut self, other: u32) {
+        match self {
+            Token::Num(n) => *n += other,
+            _ => panic!("Mathematical operation attempted on string types")
+        }
+    }
+}
+
+impl Add for Token {
+    type Output = Token;
+
+    fn add(self, other: Token) -> Token {
+        match (self, other) {
+            (Token::Num(num1), Token::Num(num2)) => Token::Num(num1 + num2),
+            _ => panic!("Mathematical operation attempted on string types")
+        }
+    }
+}
+
+impl Mul for Token {
+    type Output = Token;
+
+    fn mul(self, other: Token) -> Token {
+        match (self, other) {
+            (Token::Num(num1), Token::Num(num2)) => Token::Num(num1 * num2),
+            _ => panic!("Mathematical operation attempted on string types")
+        }
+    }
+}
+
+impl Sub for Token {
+    type Output = Token;
+
+    fn sub(self, other: Token) -> Token {
+        match (self, other) {
+            (Token::Num(num1), Token::Num(num2)) => Token::Num(num1 - num2),
+            _ => panic!("Mathematical operation attempted on string types")
+        }
+    }
+}
+
 struct Program {
-    stack: Vec<StackFrame>,
+    stack: Vec<Token>,
 }
 
 impl Program {
     fn new(user_input: &str) -> Program {
         Program {
-            stack: Vec::from([StackFrame::Num(0), StackFrame::Token(String::from(user_input))])
+            stack: Vec::from([Token::Num(2), Token::Chars(String::from(user_input))])
         }
     }
 
@@ -24,12 +65,12 @@ impl Program {
         for (line_number, line) in input.split("\n").collect::<Vec<&str>>().iter().enumerate() {
             let mut chicken_count = 0;
             for symbol in line.split(" ") {
-                if (symbol != "chicken") {
+                if symbol != "chicken" {
                     panic!("Invalid instruction '{}', line number {}", symbol, line_number);
                 }
                 chicken_count += 1;
             }
-            self.stack.push(StackFrame::Num(chicken_count));
+            self.stack.push(Token::Num(chicken_count));
         }
     }
 
@@ -49,49 +90,43 @@ impl Program {
         }
     }
 
+    fn pop_stack(&mut self) -> Token {
+        self.stack.pop().expect("Error popping from stack")
+    }
+
     fn exit(&self) {
         exit(0);
     }
 
     fn chicken(&mut self) {
-        self.stack.push(StackFrame::Token(String::from("chicken")));
+        self.stack.push(Token::Chars(String::from("chicken")));
     }
 
     fn add(&mut self) {
         let (a, b) = self.get_top_two_stack_values();
-        let result = Program::mathematical_operation(a, b, |m, n| m + n ); 
-        // TODO do something with result
+        self.stack.push(a + b);
     }
 
     fn sub(&mut self) {
         let (a, b) = self.get_top_two_stack_values();
-        let result = Program::mathematical_operation(a, b, |m, n| m - n ); 
-        // TODO do something with result
+        self.stack.push(a - b);
     }
 
     fn mul(&mut self) {
         let (a, b) = self.get_top_two_stack_values();
-        let result = Program::mathematical_operation(a, b, |m, n| m * n );
-        // TODO do something with result
+        self.stack.push(a * b);
     }
 
     fn compare(&mut self) {
         let (a, b) = self.get_top_two_stack_values();
-        match a {
-            StackFrame::Token(s) => {
-                if let StackFrame::Token(t) = b {
-                    self.stack.push(StackFrame::Num(if s == t { 1 } else { 0 } ));
-                } else {
-                    Program::type_mismatch(StackFrame::Token(s), b);
-                }
+        match (&a, &b) {
+            (Token::Chars(s), Token::Chars(t)) => {
+                self.stack.push(Token::Num(if s == t { 1 } else { 0 } ));
             },
-            StackFrame::Num(m) => {
-                if let StackFrame::Num(n) = b {
-                    self.stack.push(StackFrame::Num(if m == n { 1 } else { 0 } ));
-                } else {
-                    Program::type_mismatch(a,b); 
-                }
-            }
+            (Token::Num(m), Token::Num(n)) => {
+                self.stack.push(Token::Num(if m == n { 1 } else { 0 } ));
+            },
+            _ => panic!("Mismatched types, a: {:?}, b: {:?}", a, b)
         }
     }
 
@@ -103,43 +138,41 @@ impl Program {
         println!("TODO");
     }
 
-    fn jump(&self) {
-        println!("TODO");
+    fn jump(&mut self) {
+        let offset = self.pop_stack();
+        let condition = self.pop_stack();
+        match (offset, condition) {
+            (Token::Chars(s), _) => panic!("Stack offset is not a number: {:?}", s),
+            (Token::Num(offset), Token::Chars(c)) => {
+                if c.trim() != String::from("") {
+                    self.stack[0] += offset;
+                }
+            },
+            (Token::Num(offset), Token::Num(n)) => { 
+                if n != 0 {
+                    self.stack[0] += offset;
+                }
+            }
+        }
     }
 
     fn char(&mut self) {
-        let n = self.stack.pop().unwrap();
-        if let StackFrame::Num(n) = n {
-            self.stack.push(StackFrame::Token(String::from(std::char::from_u32(n).unwrap())))
+        let n = self.pop_stack();
+        if let Token::Num(n) = n {
+            self.stack.push(Token::Chars(String::from(std::char::from_u32(n).unwrap())))
         } else {
             self.stack.push(n)
         }
     }
 
     fn push(&mut self, n: u32) {
-        self.stack.push(StackFrame::Num(n - 10));
+        self.stack.push(Token::Num(n - 10));
     }
 
-    fn get_top_two_stack_values(&mut self) -> (StackFrame, StackFrame) {
+    fn get_top_two_stack_values(&mut self) -> (Token, Token) {
         let top = self.stack.pop().unwrap(); // TODO: Handle unwrap
         let second = self.stack.pop().unwrap(); // TODO: Handle unwrap
         (top, second)
-    }
-
-    fn type_mismatch(a: StackFrame, b:StackFrame) {
-        panic!("Mismatched types, a: {:?}, b: {:?}", a, b)
-    }
-
-    fn mathematical_operation<F: Fn(u32, u32) -> u32>(a: StackFrame, b: StackFrame, operation: F) -> u32 {
-        if let StackFrame::Num(a) = a {
-            if let StackFrame::Num(b) = b {
-                operation(a, b)
-            } else {
-                panic!("Mathematical operation applied to string {:?}", b); 
-            }
-        } else { 
-            panic!("Mathematical operation applied to string {:?}", a); 
-        }
     }
 }
 
