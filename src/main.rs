@@ -12,7 +12,7 @@ impl AddAssign<u32> for Token {
     fn add_assign(&mut self, other: u32) {
         match self {
             Token::Num(n) => *n += other,
-            _ => panic!("Mathematical operation attempted on string types")
+            _ => panic!("Mathematical operation attempted on a string – {:?}", self)
         }
     }
 }
@@ -21,9 +21,9 @@ impl Add for Token {
     type Output = Token;
 
     fn add(self, other: Token) -> Token {
-        match (self, other) {
+        match (&self, &other) {
             (Token::Num(num1), Token::Num(num2)) => Token::Num(num1 + num2),
-            _ => panic!("Mathematical operation attempted on string types")
+            _ => panic!("Mathematical operation attempted on at least one string – a: {:?} | b: {:?}", self, other)
         }
     }
 }
@@ -32,9 +32,9 @@ impl Mul for Token {
     type Output = Token;
 
     fn mul(self, other: Token) -> Token {
-        match (self, other) {
+        match (&self, &other) {
             (Token::Num(num1), Token::Num(num2)) => Token::Num(num1 * num2),
-            _ => panic!("Mathematical operation attempted on string types")
+            _ => panic!("Mathematical operation attempted on at least one string – a: {:?} | b: {:?}", self, other)
         }
     }
 }
@@ -43,9 +43,9 @@ impl Sub for Token {
     type Output = Token;
 
     fn sub(self, other: Token) -> Token {
-        match (self, other) {
+        match (&self, &other) {
             (Token::Num(num1), Token::Num(num2)) => Token::Num(num1 - num2),
-            _ => panic!("Mathematical operation attempted on string types")
+            _ => panic!("Mathematical operation attempted on at least one string – a: {:?} | b: {:?}", self, other)
         }
     }
 }
@@ -94,6 +94,10 @@ impl Program {
         self.stack.pop().expect("Error popping from stack")
     }
 
+    fn pop_stack_twice(&mut self) -> (Token, Token) {
+        (self.pop_stack(), self.pop_stack())
+    }
+
     fn exit(&self) {
         exit(0);
     }
@@ -103,22 +107,22 @@ impl Program {
     }
 
     fn add(&mut self) {
-        let (a, b) = self.get_top_two_stack_values();
+        let (a, b) = self.pop_stack_twice();
         self.stack.push(a + b);
     }
 
     fn sub(&mut self) {
-        let (a, b) = self.get_top_two_stack_values();
+        let (a, b) = self.pop_stack_twice();
         self.stack.push(a - b);
     }
 
     fn mul(&mut self) {
-        let (a, b) = self.get_top_two_stack_values();
+        let (a, b) = self.pop_stack_twice();
         self.stack.push(a * b);
     }
 
     fn compare(&mut self) {
-        let (a, b) = self.get_top_two_stack_values();
+        let (a, b) = self.pop_stack_twice();
         match (&a, &b) {
             (Token::Chars(s), Token::Chars(t)) => {
                 self.stack.push(Token::Num(if s == t { 1 } else { 0 } ));
@@ -139,8 +143,8 @@ impl Program {
     }
 
     fn jump(&mut self) {
-        let offset = self.pop_stack();
-        let condition = self.pop_stack();
+        let (offset, condition) = self.pop_stack_twice();
+
         match (offset, condition) {
             (Token::Chars(s), _) => panic!("Stack offset is not a number: {:?}", s),
             (Token::Num(offset), Token::Chars(c)) => {
@@ -167,12 +171,6 @@ impl Program {
 
     fn push(&mut self, n: u32) {
         self.stack.push(Token::Num(n - 10));
-    }
-
-    fn get_top_two_stack_values(&mut self) -> (Token, Token) {
-        let top = self.stack.pop().unwrap(); // TODO: Handle unwrap
-        let second = self.stack.pop().unwrap(); // TODO: Handle unwrap
-        (top, second)
     }
 }
 
