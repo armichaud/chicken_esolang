@@ -43,7 +43,8 @@ impl Add for Token {
     fn add(self, other: Token) -> Token {
         match (&self, &other) {
             (Token::Num(num1), Token::Num(num2)) => Token::Num(num1 + num2),
-            _ => panic!("Mathematical operation attempted on at least one string – a: {:?} | b: {:?}", self, other)
+            (Token::Chars(s1), Token::Chars(s2)) => Token::Chars(format!("{}{}", s1, s2)),
+            _ => panic!("Addition attempted on mismatched types – a: {:?} | b: {:?}", self, other)
         }
     }
 }
@@ -63,7 +64,6 @@ impl Sub for Token {
     type Output = Token;
 
     fn sub(self, other: Token) -> Token {
-        println!("{:?} - {:?}", self, other);
         match (&self, &other) {
             (Token::Num(num1), Token::Num(num2)) => Token::Num(num1 - num2),
             _ => panic!("Mathematical operation attempted on at least one string – a: {:?} | b: {:?}", self, other)
@@ -170,7 +170,7 @@ impl Program {
 
     fn add(&mut self) {
         let (a, b) = self.pop_stack_twice();
-        self.stack.push(a + b);
+        self.stack.push(b + a);
     }
 
     fn sub(&mut self) {
