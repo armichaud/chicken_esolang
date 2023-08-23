@@ -72,6 +72,7 @@ impl Sub for Token {
 
 pub struct Program {
     stack: Vec<Token>,
+    data_stack_start: usize,
     debug: bool
 }
 
@@ -79,7 +80,8 @@ impl Program {
     // Constructor
     pub fn new(code: String, user_input: &str, debug: bool) -> Program {
         let mut program = Program {
-            stack: Vec::from([Token::Num(2), Token::Chars(String::from(user_input))]), 
+            stack: Vec::from([Token::Num(2), Token::Chars(String::from(user_input))]),
+            data_stack_start: 2,
             debug
         };
         for (line_number, line) in code.split("\n").collect::<Vec<&str>>().iter().enumerate() {
@@ -94,13 +96,20 @@ impl Program {
             program.stack.push(Token::Num(chicken_count));
         }
         program.stack.push(Token::Num(0));
+        program.data_stack_start = program.stack.len();
         program
     }
 
     // Main loop
     pub fn run(&mut self) -> String {
         while self.stack[0] < self.stack.len() as i64 {
+            if self.debug {
+                println!("Load Instruction {:?}", self.stack[0]);
+            }
             let instruction = self.next_token();
+            if self.debug {
+                println!("Executing {}", instruction);
+            }
             if instruction == 0 {
                 break;
             }
@@ -114,9 +123,6 @@ impl Program {
 
     // Helpers 
     fn execute(&mut self, n: i64) {
-        if self.debug {
-            println!("Executing instruction {}", n);
-        }
         match n {
          // 0 => The EXIT OP is effectively implemented in the program's main loop above.
             1 => self.chicken(),
@@ -131,15 +137,21 @@ impl Program {
             _ => self.push(n),
         }
         if self.debug {
+            println!("Input Register: {:?}", self.stack[1]);
             println!(
-                "Stack: {:?}", 
-                self.stack.clone().into_iter().map(|token| 
-                    match token {
-                        Token::Chars(s) => s,
-                        Token::Num(n) => n.to_string(),
-                    }
-                ).collect::<Vec<String>>()
+                "Data Stack: {:?}", 
+                if let Some(data) = self.stack.get(self.data_stack_start..) {
+                    data.clone().into_iter().map(|token| 
+                        match token {
+                            Token::Chars(s) => s.clone(),
+                            Token::Num(n) => n.to_string(),
+                        }
+                    ).collect::<Vec<String>>()
+                } else {
+                    Vec::new()
+                }
             );
+            println!("\n");
         }
     }
     
