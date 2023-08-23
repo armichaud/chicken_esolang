@@ -2,7 +2,6 @@ use core::panic;
 use std::char::from_u32;
 use std::cmp::Ordering;
 use std::ops::{AddAssign, Add, Sub, Mul};
-use std::process::exit;
 
 #[derive(Debug, Clone, PartialEq)]
 enum Token {
