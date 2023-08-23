@@ -91,7 +91,6 @@ impl Program {
             }
             program.stack.push(Token::Num(chicken_count));
         }
-        println!("{:?}", program.stack);
         program.stack.push(Token::Num(0));
         program
     }
