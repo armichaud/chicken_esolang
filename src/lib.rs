@@ -148,11 +148,7 @@ impl Program {
             self.check_stack_index(index); 
             let op = self.stack[index as usize].clone();
             self.stack[0] += 1;
-            if let Token::Num(n) = op {
-                n
-            } else {
-                panic!("Attempted to get next token but instruction is string: {:?}", op);
-            }
+            if let Token::Num(n) = op { n } else { panic!("Attempted to get next token but instruction is string: {:?}", op) }
         } else {
             panic!("Attempted to get next token but stack index is string: {:?}", self.stack[0]);
         }
