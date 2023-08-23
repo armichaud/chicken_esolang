@@ -104,7 +104,7 @@ impl Program {
     pub fn run(&mut self) -> String {
         while self.stack[0] < self.stack.len() as i64 {
             if self.debug {
-                println!("Load Instruction {:?}", self.stack[0]);
+                println!("Loading Instruction {:?}", self.stack[0]);
             }
             let instruction = self.next_token();
             if self.debug {
@@ -137,9 +137,9 @@ impl Program {
             _ => self.push(n),
         }
         if self.debug {
-            println!("Input Register: {:?}", self.stack[1]);
+            println!("Resulting Input Register: {:?}", self.stack[1]);
             println!(
-                "Data Stack: {:?}", 
+                "Resulting Data Stack: {:?}", 
                 if let Some(data) = self.stack.get(self.data_stack_start..) {
                     data.clone().into_iter().map(|token| 
                         match token {
