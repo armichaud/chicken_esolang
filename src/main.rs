@@ -2,22 +2,55 @@ use chicken_esolang::*;
 use std::fs::File;
 use std::io::Read;
 
+fn usage(prefix: &str) {
+    println!("Usage: {} -- -f <filename> [-i optional_input] [--debug]", prefix);
+}
+
 fn main() {
     let args = std::env::args().collect::<Vec<String>>();
-    let args_len = args.len();
-    if args_len < 2 || args_len > 3{
-        panic!("Usage: <filename> [optional_input]");
+    if args.len() < 2 {
+        usage(&args[0]);
+        return;
     }
 
-    let path = &args[1];
-    if !path.ends_with(".chn") {
-        panic!("File must be a .chn file");
+    let mut filename = String::new();
+    let mut optional_input = String::new();
+    let mut debug_mode = false;
+
+    let mut i = 1;
+    while i < args.len() {
+        if args[i] == "--debug" {
+            debug_mode = true;
+        } else if args[i] == "-f" {
+            if i + 1 < args.len() {
+                filename = args[i + 1].clone();
+                i += 1;
+            } else {
+                println!("Missing filename after -f");
+                return;
+            }
+        } else if args[i] == "-i" {
+            if i + 1 < args.len() {
+                optional_input = args[i + 1].clone();
+                i += 1;
+            } else {
+                println!("Missing optional input after -i");
+                return;
+            }
+        } else {
+            usage(&args[0]);
+            return;
+        }
+        i += 1;
     }
 
-    let user_input = if args.len() == 3 { &args[2] } else { "" };
+    if filename == "" {
+        usage(&args[0]);
+        return;
+    }
 
     let mut buffer = String::new();
-    let file = File::open(path);
+    let file = File::open(filename);
 
     let read_result = match file {
         Ok(mut file) => file.read_to_string(&mut buffer),
@@ -25,7 +58,7 @@ fn main() {
     };
     let result = match read_result {
         Ok(_) => {
-            let mut program = Program::new(user_input, buffer);
+            let mut program = Program::new(buffer, optional_input.as_str(), debug_mode);
             program.run()
         },
         Err(_) => panic!("Error reading file")

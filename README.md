@@ -5,7 +5,7 @@ An  interpreter for the esolang [chicken](https://esolangs.org/wiki/Chicken), bu
 ## Running
 
 ```
-cargo run code_file [optional_user_input]
+cargo run -- -f filename [-i user_input] [--debug]
 ```
 
 ## Implementaiton choices

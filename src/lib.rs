@@ -72,13 +72,15 @@ impl Sub for Token {
 
 pub struct Program {
     stack: Vec<Token>,
+    debug: bool
 }
 
 impl Program {
     // Constructor
-    pub fn new(user_input: &str, code: String) -> Program {
+    pub fn new(code: String, user_input: &str, debug: bool) -> Program {
         let mut program = Program {
-            stack: Vec::from([Token::Num(2), Token::Chars(String::from(user_input))])
+            stack: Vec::from([Token::Num(2), Token::Chars(String::from(user_input))]), 
+            debug
         };
         for (line_number, line) in code.split("\n").collect::<Vec<&str>>().iter().enumerate() {
             let mut chicken_count = 0;
@@ -112,6 +114,9 @@ impl Program {
 
     // Helpers 
     fn execute(&mut self, n: i64) {
+        if self.debug {
+            println!("Executing instruction {}", n);
+        }
         match n {
          // 0 => The EXIT OP is effectively implemented in the program's main loop above.
             1 => self.chicken(),
@@ -124,6 +129,17 @@ impl Program {
             8 => self.jump(),
             9 => self.char(),
             _ => self.push(n),
+        }
+        if self.debug {
+            println!(
+                "Stack: {:?}", 
+                self.stack.clone().into_iter().map(|token| 
+                    match token {
+                        Token::Chars(s) => s,
+                        Token::Num(n) => n.to_string(),
+                    }
+                ).collect::<Vec<String>>()
+            );
         }
     }
     
