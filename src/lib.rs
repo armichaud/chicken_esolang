@@ -72,7 +72,7 @@ impl Sub for Token {
 
 pub struct Program {
     stack: Vec<Token>,
-    data_stack_start: usize,
+    data_stack_index: usize,
     debug: bool
 }
 
@@ -81,7 +81,7 @@ impl Program {
     pub fn new(code: String, user_input: &str, debug: bool) -> Program {
         let mut program = Program {
             stack: Vec::from([Token::Num(2), Token::Chars(String::from(user_input))]),
-            data_stack_start: 2,
+            data_stack_index: 2,
             debug
         };
         for (line_number, line) in code.split("\n").collect::<Vec<&str>>().iter().enumerate() {
@@ -96,7 +96,7 @@ impl Program {
             program.stack.push(Token::Num(chicken_count));
         }
         program.stack.push(Token::Num(0));
-        program.data_stack_start = program.stack.len();
+        program.data_stack_index = program.stack.len();
         program
     }
 
@@ -140,7 +140,7 @@ impl Program {
             println!("Resulting Input Register: {:?}", self.stack[1]);
             println!(
                 "Resulting Data Stack: {:?}", 
-                if let Some(data) = self.stack.get(self.data_stack_start..) {
+                if let Some(data) = self.stack.get(self.data_stack_index..) {
                     data.clone().into_iter().map(|token| 
                         match token {
                             Token::Chars(s) => s.clone(),
