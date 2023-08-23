@@ -115,7 +115,7 @@ impl Program {
     // Helpers 
     fn execute(&mut self, n: i64) {
         match n {
-            0 => self.exit(),
+         // 0 => The EXIT OP is effectively implemented in the program's main loop above.
             1 => self.chicken(),
             2 => self.add(),
             3 => self.sub(),
@@ -159,11 +159,6 @@ impl Program {
     }
 
     // OPs
-
-    fn exit(&mut self) {
-        exit(0);
-    }
-
     fn chicken(&mut self) {
         self.stack.push(Token::Chars(String::from("chicken")));
     }
