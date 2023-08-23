@@ -1,15 +1,19 @@
 use core::panic;
+use std::fs::File;
+use std::io::Read;
 use std::ops::{AddAssign, Add, Sub, Mul};
 use std::cmp::Ordering;
+use std::process::exit;
+use std::char::from_u32;
 
 #[derive(Debug, Clone, PartialEq)]
 enum Token {
     Chars(String),
-    Num(u32)
+    Num(i64)
 }
 
-impl PartialEq<u32> for Token {
-    fn eq(&self, other: &u32) -> bool {
+impl PartialEq<i64> for Token {
+    fn eq(&self, other: &i64) -> bool {
         match (self, other) {
             (Token::Num(num1), num2) => num1 == num2,
             _ => panic!("Comparison attempted on at least one string – a: {:?} | b: {:?}", self, other)
@@ -17,8 +21,8 @@ impl PartialEq<u32> for Token {
     }
 }
 
-impl PartialOrd<u32> for Token {
-    fn partial_cmp(&self, other: &u32) -> Option<Ordering> {
+impl PartialOrd<i64> for Token {
+    fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
         match (self, other) {
             (Token::Num(num1), num2) => num1.partial_cmp(&num2),
             _ => panic!("Comparison attempted on at least one string – a: {:?} | b: {:?}", self, other)
@@ -26,8 +30,8 @@ impl PartialOrd<u32> for Token {
     }
 }
 
-impl AddAssign<u32> for Token {
-    fn add_assign(&mut self, other: u32) {
+impl AddAssign<i64> for Token {
+    fn add_assign(&mut self, other: i64) {
         match self {
             Token::Num(n) => *n += other,
             _ => panic!("Mathematical operation attempted on a string – {:?}", self)
@@ -61,6 +65,7 @@ impl Sub for Token {
     type Output = Token;
 
     fn sub(self, other: Token) -> Token {
+        println!("{:?} - {:?}", self, other);
         match (&self, &other) {
             (Token::Num(num1), Token::Num(num2)) => Token::Num(num1 - num2),
             _ => panic!("Mathematical operation attempted on at least one string – a: {:?} | b: {:?}", self, other)
@@ -73,28 +78,32 @@ struct Program {
 }
 
 impl Program {
+    // Constructor
     fn new(user_input: &str) -> Program {
         Program {
             stack: Vec::from([Token::Num(2), Token::Chars(String::from(user_input))])
         }
     }
 
+    // Program methods
     fn load_instructions(&mut self, input: String) {
         for (line_number, line) in input.split("\n").collect::<Vec<&str>>().iter().enumerate() {
             let mut chicken_count = 0;
             for symbol in line.split(" ") {
-                if symbol != "chicken" {
-                    panic!("Invalid instruction '{}', line number {}", symbol, line_number);
+                match symbol {
+                    "chicken" => { chicken_count += 1 },
+                    "" => {},
+                    _ => panic!("Invalid instruction '{}', line number {}", symbol, line_number)
                 }
-                chicken_count += 1;
             }
             self.stack.push(Token::Num(chicken_count));
         }
+        println!("{:?}", self.stack);
         self.stack.push(Token::Num(0));
     }
 
     fn run(&mut self) -> Token{
-        while self.stack[0] < self.stack.len() as u32 {
+        while self.stack[0] < self.stack.len() as i64 {
             let instruction = self.next_token();
             if instruction == 0 {
                 break;
@@ -104,8 +113,9 @@ impl Program {
         return self.pop_stack();
     }
 
-    fn execute(&mut self, instruction: u32) {
-        match instruction {
+    fn execute(&mut self, n: i64) {
+        match n {
+            0 => self.exit(),
             1 => self.chicken(),
             2 => self.add(),
             3 => self.sub(),
@@ -115,12 +125,14 @@ impl Program {
             7 => self.store(),
             8 => self.jump(),
             9 => self.char(),
-            _ => self.push(instruction),
+            _ => self.push(n),
         }
     }
-
-    fn next_token(&mut self) -> u32 {
+    
+    // Helpers 
+    fn next_token(&mut self) -> i64 {
         if let Token::Num(index) = self.stack[0] {
+            self.check_stack_index(index); 
             let op = self.stack[index as usize].clone();
             self.stack[0] += 1;
             if let Token::Num(n) = op {
@@ -141,6 +153,18 @@ impl Program {
         (self.pop_stack(), self.pop_stack())
     }
 
+    fn check_stack_index(&self, index: i64) {
+        if index < 0 || index >= self.stack.len() as i64 {
+            panic!("Attempted to load from stack but index is out of bounds: {:?}", index);
+        }
+    }
+
+    // OPs
+
+    fn exit(&mut self) {
+        exit(0);
+    }
+
     fn chicken(&mut self) {
         self.stack.push(Token::Chars(String::from("chicken")));
     }
@@ -152,7 +176,7 @@ impl Program {
 
     fn sub(&mut self) {
         let (a, b) = self.pop_stack_twice();
-        self.stack.push(a - b);
+        self.stack.push(b - a);
     }
 
     fn mul(&mut self) {
@@ -166,37 +190,45 @@ impl Program {
     }
 
     fn load(&mut self) {
-        let stack_index = self.next_token();
-        let string_token = self.stack[stack_index as usize].clone();
-        let string_index = &self.pop_stack();
-        match (&string_token, string_index) {
-            (Token::Chars(s), Token::Num(i)) => {
-                if let Some((char_index, _)) = s.char_indices().nth(*i as usize) {
-                    let char_at_index = s[char_index..].chars().next().unwrap();
-                    if (*i as usize) < s.len() {
-                        self.stack.push(Token::Chars(char_at_index.to_string()));
-                    } else {
-                        panic!("Attempted to load from {:?} but index {:?} is out of bounds", s, i)
-                    }
-                } else {
-                    panic!("Attempted to load from {:?} but index {:?} is out of bounds", s, i)
-                }
-            },
-            (Token::Num(_), _) => panic!("Attempted to load char at index {:?} from {:?} but it is not a string", string_index, string_token),
-            _ => panic!("Attempted to load index {:?} but it is not a string", string_index)
+        let source = self.next_token();
+        match source {
+            0 => self.load_stack(),
+            1 => self.load_input(),
+            _ => panic!("Attempted to load from invalid source: {:?}", source)
+        }
+    }
+
+    fn load_stack(&mut self) {
+        let token = self.pop_stack();
+        if let Token::Num(index) = token {
+            self.check_stack_index(index);
+            let load = self.stack[index as usize].clone();
+            self.stack.push(load);
+        } else {
+            panic!("Stack index is not a number: {:?}", token);
+        }
+    }
+
+    fn load_input(&mut self) {
+        let token = self.pop_stack();
+        let input = self.stack[1].clone();
+        match (&token, input) {
+            (Token::Num(index), Token::Chars(s)) =>{
+                let load = Token::Chars(s.chars().nth(*index as usize).expect("Attempted to load from user input but index is out of bounds").to_string());
+                self.stack.push(load);
+            }
+            _ => panic!("Input index is not a number: {:?}", token)
         }
     }
 
     fn store(&mut self) {
         let (stack_address, value_to_load) = self.pop_stack_twice();
-        if let Token::Num(index) = stack_address {
-            if (index as usize) < self.stack.len() {
+        match stack_address {
+            Token::Num(index) => {
+                self.check_stack_index(index);
                 self.stack[index as usize] = value_to_load;
-            } else {
-                panic!("Attempted to store {:?} at index {:?} of stack length {:?}", value_to_load, stack_address, self.stack.len());
-            }
-        } else {
-            panic!("Attempted to store {:?} but stack index is string: {:?}", value_to_load, stack_address);
+            },
+            _ => panic!("Attempted to store {:?} but stack index is string: {:?}", value_to_load, stack_address)
         }
     } 
 
@@ -220,23 +252,42 @@ impl Program {
 
     fn char(&mut self) {
         let n = self.pop_stack();
-        if let Token::Num(n) = n {
-            self.stack.push(Token::Chars(String::from(std::char::from_u32(n).unwrap())))
-        } else {
-            self.stack.push(n)
-        }
+        self.stack.push(if let Token::Num(n) = n { Token::Chars(String::from(from_u32(n as u32).expect(format!("Error converting token {} to ASCII in CHAR op", n).as_str()))) } else { n });
     }
 
-    fn push(&mut self, n: u32) {
+    fn push(&mut self, n: i64) {
         self.stack.push(Token::Num(n - 10));
     }
 }
 
 fn main() {
-    let input = String::from("chicken");
-    let user_input = "";
-    let mut program = Program::new(user_input);
-    program.load_instructions(input);
-    let result = program.run();
+    let args = std::env::args().collect::<Vec<String>>();
+    let args_len = args.len();
+    if args_len < 2 || args_len > 3{
+        panic!("Usage: <filename> [optional_input]");
+    }
+
+    let path = &args[1];
+    if !path.ends_with(".chn") {
+        panic!("File must be a .chn file");
+    }
+
+    let user_input = if args.len() == 3 { &args[2] } else { "" };
+
+    let mut buffer = String::new();
+    let file = File::open(path);
+
+    let read_result = match file {
+        Ok(mut file) => file.read_to_string(&mut buffer),
+        Err(_) => panic!("Error opening file")
+    };
+    let result = match read_result {
+        Ok(_) => {
+            let mut program = Program::new(user_input);
+            program.load_instructions(buffer);
+            program.run()
+        },
+        Err(_) => panic!("Error reading file")
+    };
     println!("{:?}", result);
 }
