@@ -3,10 +3,26 @@ use std::char::from_u32;
 use std::cmp::Ordering;
 use std::ops::{AddAssign, Add, Sub, Mul};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 enum Token {
     Chars(String),
     Num(i64)
+}
+
+impl PartialEq<Token> for Token {
+    fn eq(&self, other: &Token) -> bool {
+        match (self, other) {
+            (Token::Num(num1), Token::Num(num2)) => num1 == num2,
+            (Token::Chars(s1), Token::Chars(s2)) => s1 == s2,
+            (Token::Num(n), Token::Chars(s)) | (Token::Chars(s), Token::Num(n)) => {
+                if s == "" && *n == 0 {
+                    true
+                } else {
+                    false
+                }
+            },
+        }
+    }
 }
 
 impl PartialEq<i64> for Token {
@@ -52,7 +68,7 @@ impl Add for Token {
         match (&self, &other) {
             (Token::Num(num1), Token::Num(num2)) => Token::Num(num1 + num2),
             (Token::Chars(s1), Token::Chars(s2)) => Token::Chars(format!("{}{}", s1, s2)),
-            _ => panic!("Addition attempted on mismatched types – a: {:?} | b: {:?}", self, other)
+            (Token::Chars(s), Token::Num(n)) | (Token::Num(n), Token::Chars(s)) => Token::Chars(format!("{}{}", s, n))
         }
     }
 }
@@ -176,6 +192,9 @@ impl Program {
     }
 
     fn pop_stack(&mut self) -> Token {
+        if self.stack.len() == self.data_stack_index {
+            self.data_stack_index -= 1;
+        }
         self.stack.pop().expect("Error popping from stack")
     }
 
@@ -218,8 +237,7 @@ impl Program {
         let source = self.next_token();
         match source {
             0 => self.load_stack(),
-            1 => self.load_input(),
-            _ => panic!("Attempted to load from invalid source: {:?}", source)
+            _ => self.load_input(source),
         }
     }
 
@@ -234,12 +252,12 @@ impl Program {
         }
     }
 
-    fn load_input(&mut self) {
+    fn load_input(&mut self, n: i64) {
         let token = self.pop_stack();
-        let input = self.stack[1].clone();
+        let input = self.stack[n as usize].clone();
         match (&token, input) {
             (Token::Num(index), Token::Chars(s)) =>{
-                let load = Token::Chars(s.chars().nth(*index as usize).expect("Attempted to load from user input but index is out of bounds").to_string());
+                let load = Token::Chars(String::from(s.chars().nth(*index as usize).unwrap_or_default()));
                 self.stack.push(load);
             }
             _ => panic!("Input index is not a number: {:?}", token)
