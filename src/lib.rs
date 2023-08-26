@@ -104,8 +104,17 @@ pub struct Program {
 impl Program {
     // Constructor
     pub fn new(code: String, user_input: &str, debug: bool) -> Program {
+        let input = if let Ok(num) = user_input.parse::<i64>() {
+            if num >= 0 {
+                Token::Num(num)
+            } else {
+                Token::Chars(String::from(user_input))
+            }
+        } else {
+            Token::Chars(String::from(user_input))
+        };
         let mut program = Program {
-            stack: Vec::from([Token::Num(2), Token::Chars(String::from(user_input))]),
+            stack: Vec::from([Token::Num(2), input]),
             data_stack_index: 2,
             debug
         };
