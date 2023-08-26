@@ -13,7 +13,16 @@ impl PartialEq<i64> for Token {
     fn eq(&self, other: &i64) -> bool {
         match (self, other) {
             (Token::Num(num1), num2) => num1 == num2,
-            _ => panic!("Comparison attempted on at least one string – a: {:?} | b: {:?}", self, other)
+            _ => false,
+        }
+    }
+}
+
+impl PartialEq<String> for Token {
+    fn eq(&self, other: &String) -> bool {
+        match (self, other) {
+            (Token::Chars(num1), num2) => num1 == num2,
+            _ => false,
         }
     }
 }
