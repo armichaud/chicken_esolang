@@ -19,7 +19,7 @@ cargo run -- -f filename [--debug] [--backwards_compatible] [-i user_input]
 
 tl;dr if you want to run this against any example other than hello world, use the --backwards_compatible flag.
 
-With a language like this, it feels silly to complain about obtuse design – that's largely the point. However, it's important to understand just how much the example programs are dependent on quirks of Javascript, in which the original interpreter is written, in order to run properly. Making sense of the original interpreter nearly drove me mad, but it was necessary for debugging behavior that seemed inexplicable. See the `js_interpreter/demystified.js` file for the breakdown.
+With a language like this, it feels silly to complain about obtuse design – that's largely the point. However, it's important to understand just how much the example programs are dependent on quirks of Javascript, in which the original interpreter is written, in order to run properly. Making sense of the original interpreter nearly drove me mad, but it was necessary for debugging behavior that seemed inexplicable. See the `js_interpreter/demystified.js.txt` file for the breakdown.
 
 Below are the counter-intuitive behaviors of the original interpreter and how I've chosen to approach them in this reimplementation. In general, I've only implemented JS-specific behavior when an example program relies on it.
 
