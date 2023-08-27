@@ -49,7 +49,7 @@ The ASCII conversion in the JS interpreter just interpolates the char code in be
 
 Notably, in order to get the `n` at the beginning of the `no chickens`, the 11th char is loaded from the value at index 2, i.e. `&#32;chicken&#115;&#10;`. Ironically, CHAR _has_ to push HTML character codes in order for this to work – the 11th index is out of bounds in `" chickens\n"` – but the `n` itself is just prepended as is, so the output looks like `n&#111;&#32;chicken&#115;&#10;`.
 
-If the index is greater than or equal to the length of the token, in JS it returns the special `undefined` value. Deadfish relies on this behavior in multiple places, so in backwards compatibility mode, we return `"undefined".to_string()`, but we're otherwise erroring, because this shouldn't be a thing. 
+If the index is greater than or equal to the length of the token, Javascript returns the special `undefined` value. Deadfish relies on this behavior in multiple places, so in backwards compatibility mode, we return `"undefined".to_string()`, but we're otherwise erroring, because this shouldn't be a thing. 
 
 TODO: Figure out if Deadfish actually uses `undefined` as a string, or as some kind of weird falsy value.
 
