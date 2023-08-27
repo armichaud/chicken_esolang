@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::Read;
 
 fn usage(prefix: &str) {
-    println!("Usage: {} -- -f <filename> [-i optional_input] [--debug]", prefix);
+    println!("Usage: {} -- -f <filename> [-i optional_input] [--debug] [--backwards_compatible]", prefix);
 }
 
 fn main() {
@@ -16,11 +16,14 @@ fn main() {
     let mut filename = String::new();
     let mut optional_input = String::new();
     let mut debug_mode = false;
+    let mut backwards_compatible = false;
 
     let mut i = 1;
     while i < args.len() {
         if args[i] == "--debug" {
             debug_mode = true;
+        } else if args[i] == "--backwards_compatible" {
+            backwards_compatible = true;
         } else if args[i] == "-f" {
             if i + 1 < args.len() {
                 filename = args[i + 1].clone();
@@ -58,7 +61,7 @@ fn main() {
     };
     let result = match read_result {
         Ok(_) => {
-            let mut program = Program::new(buffer, optional_input.as_str(), debug_mode);
+            let mut program = Program::new(buffer, optional_input.as_str(), debug_mode, backwards_compatible);
             program.run()
         },
         Err(_) => panic!("Error reading file")

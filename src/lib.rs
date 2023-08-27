@@ -9,8 +9,8 @@ enum Token {
     Num(i64)
 }
 
-impl PartialEq<Token> for Token {
-    fn eq(&self, other: &Token) -> bool {
+impl Token {
+    fn js_eq(&self, other: &Token) -> bool {
         match (self, other) {
             (Token::Num(num1), Token::Num(num2)) => num1 == num2,
             (Token::Chars(s1), Token::Chars(s2)) => s1 == s2,
@@ -21,6 +21,16 @@ impl PartialEq<Token> for Token {
                     false
                 }
             },
+        }
+    }
+}
+
+impl PartialEq<Token> for Token {
+    fn eq(&self, other: &Token) -> bool {
+        match (self, other) {
+            (Token::Num(num1), Token::Num(num2)) => num1 == num2,
+            (Token::Chars(s1), Token::Chars(s2)) => s1 == s2,
+            _ => false,
         }
     }
 }
@@ -98,12 +108,13 @@ impl Sub for Token {
 pub struct Program {
     stack: Vec<Token>,
     data_stack_index: usize,
-    debug: bool
+    debug: bool,
+    backwards_compatible: bool
 }
 
 impl Program {
     // Constructor
-    pub fn new(code: String, user_input: &str, debug: bool) -> Program {
+    pub fn new(code: String, user_input: &str, debug: bool, backwards_compatible: bool) -> Program {
         let input = if let Ok(num) = user_input.parse::<i64>() {
             if num >= 0 {
                 Token::Num(num)
@@ -116,7 +127,8 @@ impl Program {
         let mut program = Program {
             stack: Vec::from([Token::Num(2), input]),
             data_stack_index: 2,
-            debug
+            debug,
+            backwards_compatible
         };
         for (line_number, line) in code.split("\n").collect::<Vec<&str>>().iter().enumerate() {
             let mut chicken_count = 0;
@@ -239,18 +251,18 @@ impl Program {
 
     fn compare(&mut self) {
         let (a, b) = self.pop_stack_twice();
-        self.stack.push(if a == b { Token::Num(1) } else { Token::Num(0) } ); 
+        self.stack.push(if (self.backwards_compatible && a.js_eq(&b)) || a == b { Token::Num(1) } else { Token::Num(0) } ); 
     }
 
     fn load(&mut self) {
         let source = self.next_token();
         match source {
-            0 => self.load_stack(),
-            _ => self.load_input(source),
+            0 => self.load_from_stack(),
+            _ => self.load_from_token(source),
         }
     }
 
-    fn load_stack(&mut self) {
+    fn load_from_stack(&mut self) {
         let token = self.pop_stack();
         if let Token::Num(index) = token {
             self.check_stack_index(index);
@@ -261,12 +273,18 @@ impl Program {
         }
     }
 
-    fn load_input(&mut self, n: i64) {
+    fn load_from_token(&mut self, stack_index: i64) {
         let token = self.pop_stack();
-        let input = self.stack[n as usize].clone();
+        let input = self.stack[stack_index as usize].clone();
         match (&token, input) {
-            (Token::Num(index), Token::Chars(s)) =>{
-                let load = Token::Chars(String::from(s.chars().nth(*index as usize).unwrap_or_default()));
+            (Token::Num(token_index), Token::Chars(s)) =>{
+                let load = Token::Chars(s.chars().nth(*token_index as usize).map(|c| c.to_string()).unwrap_or_else({|| 
+                    if self.backwards_compatible {
+                        "undefined".to_string()
+                    } else { 
+                        panic!("Attempted to load from string but index is out of bounds: {:?}", token_index);
+                    }
+                }));
                 self.stack.push(load);
             }
             _ => panic!("Input index is not a number: {:?}", token)
@@ -304,7 +322,14 @@ impl Program {
 
     fn char(&mut self) {
         let n = self.pop_stack();
-        self.stack.push(if let Token::Num(n) = n { Token::Chars(String::from(from_u32(n as u32).expect(format!("Error converting token {} to ASCII in CHAR op", n).as_str()))) } else { n });
+        if self.backwards_compatible {
+            match n {
+                Token::Chars(n) => self.stack.push(Token::Chars(format!("&#{};", n))),
+                Token::Num(n) => self.stack.push(Token::Chars(format!("&#{};", n))),
+            }
+        } else {
+            self.stack.push(if let Token::Num(n) = n { Token::Chars(String::from(from_u32(n as u32).expect(format!("Error converting token {} to ASCII in CHAR op", n).as_str()))) } else { n });
+        }
     }
 
     fn push(&mut self, n: i64) {
