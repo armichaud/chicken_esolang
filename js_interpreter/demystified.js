@@ -1,3 +1,5 @@
+// The original: https://web.archive.org/web/20180420010853/http://torso.me/chicken
+
 // I still don't feel like I understand this entirely, but this was useful for debugging.
 // Here's what the variables generally refer to during execution:
 
