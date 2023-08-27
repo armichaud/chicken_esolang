@@ -15,8 +15,7 @@ Major TODOS (all pertain to enabling backwards compatibility):
 cargo run -- -f filename [--debug] [--backwards_compatible] [-i user_input] 
 ```
 
-## The Javascript Interpreter, or
-## How I Learned to Stop Worrying and Chicken Chicken Chicken
+## The Javascript Interpreter or: How I Learned to Stop Worrying and Chicken Chicken Chicken
 
 tl;dr if you want to run this against any example other than hello world, use the --backwards_compatible flag.
 
