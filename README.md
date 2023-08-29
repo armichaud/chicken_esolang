@@ -5,9 +5,8 @@ An interpreter for the esolang [chicken](https://esolangs.org/wiki/Chicken), bui
 WIP as of Aug 27, 2023
 
 Major TODOS (all pertain to enabling backwards compatibility):
-- Figure out why 99 chickens prepends an extra `&#32;chicken&#115;&#10;` to all numeric inputs greater than 1.
-- Figure out why there's no space between `1` and `chicken`.
 - Get Deadfish working
+- Write my own program that's not reliant on backwards compatible features
 
 ## Running
 

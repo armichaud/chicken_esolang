@@ -78,7 +78,8 @@ impl Add for Token {
         match (&self, &other) {
             (Token::Num(num1), Token::Num(num2)) => Token::Num(num1 + num2),
             (Token::Chars(s1), Token::Chars(s2)) => Token::Chars(format!("{}{}", s1, s2)),
-            (Token::Chars(s), Token::Num(n)) | (Token::Num(n), Token::Chars(s)) => Token::Chars(format!("{}{}", s, n))
+            (Token::Chars(s), Token::Num(n)) => Token::Chars(format!("{}{}", s, n)),
+            (Token::Num(n), Token::Chars(s)) => Token::Chars(format!("{}{}", n, s))
         }
     }
 }
