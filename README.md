@@ -16,11 +16,11 @@ cargo run -- -f filename [--debug] [--backwards_compatible] [-i user_input]
 
 ## The Javascript Interpreter or: How I Learned to Stop Worrying and Chicken Chicken Chicken
 
-_tl;dr if you want to run this against any example other than hello world, use the --backwards_compatible flag._
+_tl;dr The 99 Bananas and DeadFish programs require the --backwards_compatible flag to work the way they do when run through the original interpreter._
 
-With a language like this, it feels silly to complain about obtuse design – that's largely the point. However, it's important to understand just how much the example programs are dependent on quirks of Javascript, in which the original interpreter is written, in order to run properly. Making sense of the original interpreter nearly drove me mad, but it was necessary for debugging behavior that seemed inexplicable. See the `js_interpreter/demystified.js.txt` file for the breakdown.
+With an esolang like this, it feels silly to complain about obtuse design – that's largely the point. However, it's important to understand just how much the example programs are dependent on quirks of Javascript, in which the original interpreter is written, in order to run properly. Making sense of the original interpreter nearly drove me mad, but it was necessary for debugging behavior that seemed inexplicable. See the `js_interpreter/demystified.js.txt` file for the breakdown.
 
-The beauty of Rust is that it forces developers to confront potentially erratic program behavior through strict typing (among other rules and guarantees). In that spirit, if you want to write programs in chicken – and, to be clear, you shouldn't, but if you insist on it – this interpreter will, by default, throw an error in cases where the original interpreter would just do something weird. Backwards compatibility mode is designed specifically to emulate the behavior of the original interpreter in the interest of runnning the examples. 
+The beauty of Rust is that it forces developers to confront potentially erratic program behavior through strict typing (among other rules and guarantees). In that spirit, if you want to write programs in chicken – and, to be clear, you shouldn't, but if you insist on it – this interpreter will, by default, throw an error in cases where the original interpreter would just do something weird. Backwards compatibility mode is designed specifically to emulate the behavior of the original interpreter in the interest of runnning the legacy examples. 
 
 Below are the counter-intuitive behaviors of the original interpreter and how I've chosen to handle them. In general, I've only implemented JS-specific behavior when an example program relies on it. 
 
