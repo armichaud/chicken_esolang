@@ -23,6 +23,13 @@ impl Token {
             },
         }
     }
+
+    fn js_sub(self, other: Token) -> Token {
+        match (&self, &other) {
+            (Token::Num(num1), Token::Num(num2)) => Token::Num(num1 - num2),
+            _ => Token::Chars(String::from("NaN"))
+        }
+    }
 }
 
 impl PartialEq<Token> for Token {
@@ -242,7 +249,11 @@ impl Program {
 
     fn sub(&mut self) {
         let (a, b) = self.pop_stack_twice();
-        self.stack.push(b - a);
+        if self.backwards_compatible {
+            self.stack.push(b.js_sub(a));
+        } else {
+            self.stack.push(b - a);
+        }
     }
 
     fn mul(&mut self) {
@@ -309,7 +320,7 @@ impl Program {
         match (offset, condition) {
             (Token::Chars(s), _) => panic!("Stack offset is not a number: {:?}", s),
             (Token::Num(offset), Token::Chars(c)) => {
-                if c.trim() != String::from("") {
+                if c.trim() != String::from("") && !(self.backwards_compatible && c.trim() == String::from("NaN")) {
                     self.stack[0] += offset;
                 }
             },

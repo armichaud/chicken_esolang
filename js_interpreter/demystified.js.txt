@@ -63,7 +63,7 @@ function chicken(CHICKEN, Chicken) {
         
         :(CHICKEN = chicken.Chicken[chicken.CHICKEN],
             // NOT ORIGINAL: this is my own debug statement
-            // console.log({ first_registers: chicken.chicken.slice(1,4), opcode: Chicken, data: chicken.Chicken.slice(111)}), 
+            console.log({ first_registers: chicken.chicken.slice(1,4), opcode: Chicken, data: chicken.Chicken.slice(111)}), 
             Chicken? (
                 Chicken = --Chicken?
                     --Chicken? 
@@ -81,7 +81,7 @@ function chicken(CHICKEN, Chicken) {
                                     : chicken.Chicken[chicken.Chicken[chicken.$Chicken++]][CHICKEN] // Load
                                 : CHICKEN == chicken.Chicken[--chicken.CHICKEN] // Comparison
                             : CHICKEN * chicken.Chicken[--chicken.CHICKEN] // Multiplication
-                        : chicken.Chicken[--chicken.CHICKEN] - CHICKEN && chicken.CHICKEN == 1 // Subtraction
+                        : chicken.Chicken[--chicken.CHICKEN] - CHICKEN // Subtraction
                     : chicken.Chicken[--chicken.CHICKEN] + CHICKEN // Addition
                 : chicken.CHICKEN ++ && "chicken", // Chicken
             chicken.Chicken[chicken.CHICKEN] = Chicken, chicken(),
