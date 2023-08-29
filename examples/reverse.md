@@ -1,6 +1,6 @@
 # reverse.chn 
 
-Reverse the input string. This file represents each instructions as an int. Line numbers are prepended for ease of following JUMPs.
+Reverse the input string. This file represents each instruction as the number of chickens on each line. Line numbers are prepended for ease of following JUMPs.
 
 Note that this program will loop infinitely in backwards compatible mode: char conversion of 0 results in `&#0;`, which will not pass comparisons to trigger the end of the loop.
 

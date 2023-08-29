@@ -6,7 +6,6 @@ WIP as of Aug 27, 2023
 
 Major TODOS (all pertain to enabling backwards compatibility):
 - Get Deadfish working
-- Write my own program that's not reliant on backwards compatible features
 
 ## Running
 
