@@ -2,15 +2,10 @@
 
 An interpreter for the esolang [chicken](https://esolangs.org/wiki/Chicken), built in Rust. As you'll read below, [the web archive of the original interpreter](https://web.archive.org/web/20180420010853/http://torso.me/chicken) was critical for understanding some of the implementation details.
 
-WIP as of Aug 27, 2023
-
-Major TODOS (all pertain to enabling backwards compatibility):
-- Get Deadfish working
-
-## Running
+## CLI Usage 
 
 ```
-cargo run -- -f filename [--debug] [--backwards_compatible] [-i user_input] 
+cargo run -- -f filename [--debug] [--backwards_compatible] [-i optional_input] 
 ```
 
 ## The Javascript Interpreter or: How I Learned to Stop Worrying and Chicken Chicken Chicken
