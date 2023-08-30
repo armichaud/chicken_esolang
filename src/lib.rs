@@ -288,8 +288,9 @@ impl Program {
     fn load_from_token(&mut self, stack_index: i64) {
         let token = self.pop_stack();
         let input = self.stack[stack_index as usize].clone();
-        match (&token, input) {
-            (Token::Num(token_index), Token::Chars(s)) =>{
+        println!("Loading from {:?} in {:?}", token, input);
+        match (&token, &input) {
+            (Token::Num(token_index), Token::Chars(s)) => {
                 let load = Token::Chars(s.chars().nth(*token_index as usize).map(|c| c.to_string()).unwrap_or_else({|| 
                     if self.backwards_compatible {
                         "undefined".to_string()
@@ -298,8 +299,16 @@ impl Program {
                     }
                 }));
                 self.stack.push(load);
-            }
-            _ => panic!("Input index is not a number: {:?}", token)
+            },
+            (Token::Num(_), Token::Num(_)) => {
+                if self.backwards_compatible {
+                    self.stack.push(Token::Chars("undefined".to_string()));
+                } else {
+                    panic!("Invalid load parameters. Index: {:?}, Token at Index: {:?}", token, input);
+                }
+                
+            },
+            _ => panic!("Invalid load parameters. Index: {:?}, Token at Index: {:?}", token, input)
         }
     }
 
