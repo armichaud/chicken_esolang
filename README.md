@@ -34,7 +34,9 @@ Below are the counter-intuitive behaviors of the original interpreter and how I'
 
 ### COMPARE
 
-Instruction 34 of the 99 chickens program will compare 0 against the value loaded from the user input register. The program relies on this at some point being true in order to JUMP to the end and build the final `no chickens` (for certain inputs). Sane programming languages return false when comparing 0 and an empty string, but not Javascript! And so, when `backwards_compatibility` is enabled, the comparison mimics the behavior of the JS loose equality operator, and `'' == 0` evaluates to `true`.
+Instruction 34 of the 99 chickens program will compare 0 against the value loaded from the user input register. The program relies on this at some point being true in order to JUMP to the end and build the final `no chickens` (for certain inputs). Sane programming languages return false when comparing 0 and an empty string, but not Javascript! And so, when `backwards_compatibility` is enabled, the comparison mimics the behavior of the JS loose equality operator, and `'' == 0` evaluates as truthy.
+
+The original interpreter returns `true` and `false` from comparisons, which are cast as strings when concatenated. Deadfish relies on this behavior in order to hackily retrieve the letter `s` from `false`, so in backwards compatibility mode, we return `"false".to_string()`, and hardcode truthiness for a comparison with an empty string.
 
 ### ADD
 
@@ -58,9 +60,7 @@ The ASCII conversion in the JS interpreter just interpolates the char code in be
 
 Notably, in order to get the `n` at the beginning of the `no chickens`, the 11th char is loaded from the value at index 2, i.e. `&#32;chicken&#115;&#10;`. Ironically, CHAR _has_ to push HTML character codes in order for this to work – the 11th index is out of bounds in `" chickens\n"` – but the `n` itself is just prepended as is, so the output looks like `n&#111;&#32;chicken&#115;&#10;`.
 
-If the index is greater than or equal to the length of the token, Javascript returns the special `undefined` value. Deadfish relies on this behavior in multiple places, so in backwards compatibility mode, we return `"undefined".to_string()`.
-
-TODO: Figure out if Deadfish actually uses `undefined` as a string, or as some kind of weird falsy value.
+If the index is greater than or equal to the length of the token, Javascript returns the special `undefined` value. Deadfish relies on this behavior in order to hackily retrieve the letter `i`, so in backwards compatibility mode, we return `"undefined".to_string()`.
 
 ### The Stack
 
