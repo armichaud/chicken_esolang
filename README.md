@@ -13,7 +13,7 @@ cargo run -- -f filename [--debug] [--backwards_compatible] [-i optional_input]
 ```
 use chicken_esolang::Chicken;
 
-let code = "chicken";
+let code = String("chicken");
 let input = "";
 let debug = false;
 let backwards_compatible = false;
