@@ -8,6 +8,20 @@ An interpreter for the esolang [chicken](https://esolangs.org/wiki/Chicken), bui
 cargo run -- -f filename [--debug] [--backwards_compatible] [-i optional_input] 
 ```
 
+## Crate Usage 
+
+```
+use chicken_esolang::Chicken;
+
+let code = "chicken";
+let input = "";
+let debug = false;
+let backwards_compatible = false;
+
+let mut chicken = Chicken::new(code, input, debug, backwards_compatible);
+chicken.run()
+```
+
 ## The Javascript Interpreter or: How I Learned to Stop Worrying and Chicken Chicken Chicken
 
 _tl;dr The 99 Bananas and DeadFish programs require the --backwards_compatible flag to work the way they do when run through the original interpreter._
