@@ -1,8 +1,6 @@
-// I've given this a .txt extension so that Github doesn't suggest that nearly 50% of this project is written in JS.
-
 // The original interpreter: https://web.archive.org/web/20180420010853/http://torso.me/chicken
 
-// I still don't feel like I understand this entirely, but this was useful for debugging.
+// I still don't feel like I understand this entirely, but this much was useful for debugging.
 // Here's what the variables generally refer to during execution:
 
 // chicken.Chicken and chicken.chicken => Stack
@@ -63,7 +61,7 @@ function chicken(CHICKEN, Chicken) {
         
         :(CHICKEN = chicken.Chicken[chicken.CHICKEN],
             // NOT ORIGINAL: this is my own debug statement
-            console.log({ first_registers: chicken.chicken.slice(1,4), opcode: Chicken, data: chicken.Chicken.slice(111)}), 
+            console.log({ first_registers: chicken.chicken.slice(1,7), opcode: Chicken, data: chicken.Chicken.slice(140)}), 
             Chicken? (
                 Chicken = --Chicken?
                     --Chicken? 
@@ -93,6 +91,7 @@ function chicken(CHICKEN, Chicken) {
 }
 
 // 99 chickens program for testing
+/*
 console.log(chicken('asdf', `chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
 chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
 chicken chicken chicken chicken
@@ -201,4 +200,144 @@ chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken 
 chicken chicken chicken
 chicken chicken chicken chicken chicken chicken chicken chicken
 `));
+*/
 
+console.log(chicken('iissiso', `chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken
+chicken
+chicken chicken
+chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken chicken chicken chicken chicken
+chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken
+chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken chicken chicken chicken chicken
+chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken
+chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken chicken chicken chicken chicken
+chicken
+chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken chicken chicken chicken chicken
+chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken
+
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken
+
+chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken chicken
+chicken chicken chicken
+chicken chicken chicken chicken chicken chicken chicken chicken`));

@@ -15,7 +15,7 @@ impl Token {
             (Token::Num(num1), Token::Num(num2)) => num1 == num2,
             (Token::Chars(s1), Token::Chars(s2)) => s1 == s2,
             (Token::Num(n), Token::Chars(s)) | (Token::Chars(s), Token::Num(n)) => {
-                if s == "" && *n == 0 {
+                if *n == 0 && (s == "" || s == "false") {
                     true
                 } else {
                     false
@@ -263,7 +263,13 @@ impl Program {
 
     fn compare(&mut self) {
         let (a, b) = self.pop_stack_twice();
-        self.stack.push(if (self.backwards_compatible && a.js_eq(&b)) || a == b { Token::Num(1) } else { Token::Num(0) } ); 
+        let token;
+        if self.backwards_compatible {
+            token = if a.js_eq(&b) { Token::Num(1) } else { Token::Chars("false".to_string()) };
+        } else {
+           token = if a == b { Token::Num(1) } else { Token::Num(0) }; 
+        }
+        self.stack.push(token);
     }
 
     fn load(&mut self) {
@@ -288,7 +294,6 @@ impl Program {
     fn load_from_token(&mut self, stack_index: i64) {
         let token = self.pop_stack();
         let input = self.stack[stack_index as usize].clone();
-        println!("Loading from {:?} in {:?}", token, input);
         match (&token, &input) {
             (Token::Num(token_index), Token::Chars(s)) => {
                 let load = Token::Chars(s.chars().nth(*token_index as usize).map(|c| c.to_string()).unwrap_or_else({|| 
@@ -329,7 +334,8 @@ impl Program {
         match (offset, condition) {
             (Token::Chars(s), _) => panic!("Stack offset is not a number: {:?}", s),
             (Token::Num(offset), Token::Chars(c)) => {
-                if c.trim() != String::from("") && !(self.backwards_compatible && c.trim() == String::from("NaN")) {
+                let trimmed = c.trim();
+                if trimmed != "" && !(self.backwards_compatible && vec!["NaN", "false", "undefined"].contains(&trimmed)) {
                     self.stack[0] += offset;
                 }
             },
@@ -355,5 +361,176 @@ impl Program {
 
     fn push(&mut self, n: i64) {
         self.stack.push(Token::Num(n - 10));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use rstest::{fixture, rstest};
+    use super::*;
+
+    mod hello_world {
+        use super::*;
+
+        #[fixture]
+        fn code () -> String {
+            std::fs::read_to_string("examples/legacy/hello_world.chn").expect("Error reading file")
+        }
+
+        #[rstest]
+        fn default(code: String) {     
+            let mut program = Program::new(code, "", false, false);
+            assert_eq!(program.run(), "Hello world");
+        }
+
+        #[rstest]
+        fn bc(code: String) {     
+            let mut program = Program::new(code, "", false, true);
+            assert_eq!(program.run(), "&#72;&#101;&#108;&#108;&#111;&#32;&#119;&#111;&#114;&#108;&#100;");
+        }
+        
+        #[rstest]
+        fn throw_away_input(code: String) {     
+            let mut program = Program::new(code, "asdf", false, false);
+            assert_eq!(program.run(), "Hello world");
+        }
+
+        #[rstest]
+        fn bc_with_input(code: String) {     
+            let mut program = Program::new(code, "asdf", false, true);
+            assert_eq!(program.run(), "&#72;&#101;&#108;&#108;&#111;&#32;&#119;&#111;&#114;&#108;&#100;");
+        }
+    }
+
+    mod cat {
+        use super::*;
+
+        #[fixture]
+        fn code () -> String {
+            std::fs::read_to_string("examples/legacy/cat.chn").expect("Error reading file")
+        }
+
+        #[rstest]
+        fn no_input(code: String) {     
+            let mut program = Program::new(code, "", false, false);
+            assert_eq!(program.run(), "");
+        }
+
+        #[rstest]
+        fn with_string(code: String) {     
+            let mut program = Program::new(code, "asdf", false, false);
+            assert_eq!(program.run(), "asdf");
+        }
+
+        #[rstest]
+        fn bc(code: String) {     
+            let mut program = Program::new(code, "", false, true);
+            assert_eq!(program.run(), "");
+        }
+
+        #[rstest]
+        fn bc_with_string(code: String) {     
+            let mut program = Program::new(code, "asdf", false, true);
+            assert_eq!(program.run(), "asdf");
+        }
+    }
+
+    mod ninety_nine_chickens {
+        use super::*;
+
+        #[fixture]
+        fn code () -> String {
+            std::fs::read_to_string("examples/legacy/99_chickens.chn").expect("Error reading file")
+        }
+
+        #[rstest]
+        fn no_input(code: String) {     
+            let mut program = Program::new(code, "", false, true);
+            assert_eq!(program.run(), "n&#111;&#32;chicken&#115;&#10;");
+        }
+
+        #[rstest]
+        fn with_string(code: String) {     
+            let mut program = Program::new(code, "asdf", false, true);
+            assert_eq!(program.run(), "asdf&#32;chicken&#115;&#10;1&#32;chicken&#10;n&#111;&#32;chicken&#115;&#10;");
+        }
+
+        #[rstest]
+        fn with_numbers(code: String) {     
+            let mut program = Program::new(code, "4", false, true);
+            assert_eq!(program.run(), "4&#32;chicken&#115;&#10;3&#32;chicken&#115;&#10;2&#32;chicken&#115;&#10;1&#32;chicken&#10;n&#111;&#32;chicken&#115;&#10;");
+        }
+    }
+
+    mod deadfish {
+        use super::*;
+
+        #[fixture]
+        fn code () -> String {
+            std::fs::read_to_string("examples/legacy/deadfish.chn").expect("Error reading file")
+        }
+
+        #[rstest]   
+        fn no_input(code: String) {
+            let mut program = Program::new(code, "", false, true);
+            assert_eq!(program.run(), "&#32;");
+        }
+
+        #[rstest]
+        fn iissiso(code: String) {
+            let mut program = Program::new(code, "iissiso", false, true);
+            assert_eq!(program.run(), "&#32;289&#32;");
+        }
+
+        #[rstest]
+        fn diissisdo(code: String) {
+            let mut program = Program::new(code, "diissisdo", false, true);
+            assert_eq!(program.run(), "&#32;288&#32;");
+        }
+
+        #[rstest]
+        fn two_fifty_five_eq_zero(code: String) {
+            let mut program = Program::new(code, "iissso", false, true);
+            assert_eq!(program.run(), "&#32;0&#32;");
+        }
+
+        #[rstest]
+        fn decrement_to_255(code: String) {
+            let mut program = Program::new(code, "iissisdddddddddddddddddddddddddddddddddo", false, true);
+            assert_eq!(program.run(), "&#32;0&#32;");
+        }
+
+        #[rstest]
+        fn hello_world_ascii(code: String) {
+            let mut program = Program::new(code, "iiisdsiiiiiiiioiiiiiiiiiiiiiiiiiiiiiiiiiiiiioiiiiiiiooiiiodddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddoddddddddddddodddddddddddddddddddddsddoddddddddoiiioddddddoddddddddodddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddo", false, true);
+            assert_eq!(program.run(), "&#32;72&#32;101&#32;108&#32;108&#32;111&#32;44&#32;32&#32;119&#32;111&#32;114&#32;108&#32;100&#32;33&#32;");
+        }
+    }
+
+    mod reverse {
+        use super::*;
+
+        #[fixture]
+        fn code () -> String {
+            std::fs::read_to_string("examples/custom/reverse.chn").expect("Error reading file")
+        }
+
+        #[rstest]
+        fn no_input(code: String) {     
+            let mut program = Program::new(code, "", false, false);
+            assert_eq!(program.run(), "");
+        }
+
+        #[rstest]
+        fn with_string(code: String) {     
+            let mut program = Program::new(code, "asdf", false, false);
+            assert_eq!(program.run(), "fdsa");
+        }
+
+        #[rstest]
+        fn with_numbers(code: String) {     
+            let mut program = Program::new(code, "1234", false, false);
+            assert_eq!(program.run(), "4321");
+        }
     }
 }
