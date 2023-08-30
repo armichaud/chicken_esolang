@@ -113,16 +113,16 @@ impl Sub for Token {
     }
 }
 
-pub struct Program {
+pub struct Chicken {
     stack: Vec<Token>,
     data_stack_index: usize,
     debug: bool,
     backwards_compatible: bool
 }
 
-impl Program {
+impl Chicken {
     // Constructor
-    pub fn new(code: String, user_input: &str, debug: bool, backwards_compatible: bool) -> Program {
+    pub fn new(code: String, user_input: &str, debug: bool, backwards_compatible: bool) -> Chicken {
         let input = if let Ok(num) = user_input.parse::<i64>() {
             if num >= 0 {
                 Token::Num(num)
@@ -132,7 +132,7 @@ impl Program {
         } else {
             Token::Chars(String::from(user_input))
         };
-        let mut program = Program {
+        let mut program = Chicken {
             stack: Vec::from([Token::Num(2), input]),
             data_stack_index: 2,
             debug,
@@ -379,25 +379,25 @@ mod tests {
 
         #[rstest]
         fn default(code: String) {     
-            let mut program = Program::new(code, "", false, false);
+            let mut program = Chicken::new(code, "", false, false);
             assert_eq!(program.run(), "Hello world");
         }
 
         #[rstest]
         fn bc(code: String) {     
-            let mut program = Program::new(code, "", false, true);
+            let mut program = Chicken::new(code, "", false, true);
             assert_eq!(program.run(), "&#72;&#101;&#108;&#108;&#111;&#32;&#119;&#111;&#114;&#108;&#100;");
         }
         
         #[rstest]
         fn throw_away_input(code: String) {     
-            let mut program = Program::new(code, "asdf", false, false);
+            let mut program = Chicken::new(code, "asdf", false, false);
             assert_eq!(program.run(), "Hello world");
         }
 
         #[rstest]
         fn bc_with_input(code: String) {     
-            let mut program = Program::new(code, "asdf", false, true);
+            let mut program = Chicken::new(code, "asdf", false, true);
             assert_eq!(program.run(), "&#72;&#101;&#108;&#108;&#111;&#32;&#119;&#111;&#114;&#108;&#100;");
         }
     }
@@ -412,25 +412,25 @@ mod tests {
 
         #[rstest]
         fn no_input(code: String) {     
-            let mut program = Program::new(code, "", false, false);
+            let mut program = Chicken::new(code, "", false, false);
             assert_eq!(program.run(), "");
         }
 
         #[rstest]
         fn with_string(code: String) {     
-            let mut program = Program::new(code, "asdf", false, false);
+            let mut program = Chicken::new(code, "asdf", false, false);
             assert_eq!(program.run(), "asdf");
         }
 
         #[rstest]
         fn bc(code: String) {     
-            let mut program = Program::new(code, "", false, true);
+            let mut program = Chicken::new(code, "", false, true);
             assert_eq!(program.run(), "");
         }
 
         #[rstest]
         fn bc_with_string(code: String) {     
-            let mut program = Program::new(code, "asdf", false, true);
+            let mut program = Chicken::new(code, "asdf", false, true);
             assert_eq!(program.run(), "asdf");
         }
     }
@@ -445,19 +445,19 @@ mod tests {
 
         #[rstest]
         fn no_input(code: String) {     
-            let mut program = Program::new(code, "", false, true);
+            let mut program = Chicken::new(code, "", false, true);
             assert_eq!(program.run(), "n&#111;&#32;chicken&#115;&#10;");
         }
 
         #[rstest]
         fn with_string(code: String) {     
-            let mut program = Program::new(code, "asdf", false, true);
+            let mut program = Chicken::new(code, "asdf", false, true);
             assert_eq!(program.run(), "asdf&#32;chicken&#115;&#10;1&#32;chicken&#10;n&#111;&#32;chicken&#115;&#10;");
         }
 
         #[rstest]
         fn with_numbers(code: String) {     
-            let mut program = Program::new(code, "4", false, true);
+            let mut program = Chicken::new(code, "4", false, true);
             assert_eq!(program.run(), "4&#32;chicken&#115;&#10;3&#32;chicken&#115;&#10;2&#32;chicken&#115;&#10;1&#32;chicken&#10;n&#111;&#32;chicken&#115;&#10;");
         }
     }
@@ -472,37 +472,37 @@ mod tests {
 
         #[rstest]   
         fn no_input(code: String) {
-            let mut program = Program::new(code, "", false, true);
+            let mut program = Chicken::new(code, "", false, true);
             assert_eq!(program.run(), "&#32;");
         }
 
         #[rstest]
         fn iissiso(code: String) {
-            let mut program = Program::new(code, "iissiso", false, true);
+            let mut program = Chicken::new(code, "iissiso", false, true);
             assert_eq!(program.run(), "&#32;289&#32;");
         }
 
         #[rstest]
         fn diissisdo(code: String) {
-            let mut program = Program::new(code, "diissisdo", false, true);
+            let mut program = Chicken::new(code, "diissisdo", false, true);
             assert_eq!(program.run(), "&#32;288&#32;");
         }
 
         #[rstest]
         fn two_fifty_five_eq_zero(code: String) {
-            let mut program = Program::new(code, "iissso", false, true);
+            let mut program = Chicken::new(code, "iissso", false, true);
             assert_eq!(program.run(), "&#32;0&#32;");
         }
 
         #[rstest]
         fn decrement_to_255(code: String) {
-            let mut program = Program::new(code, "iissisdddddddddddddddddddddddddddddddddo", false, true);
+            let mut program = Chicken::new(code, "iissisdddddddddddddddddddddddddddddddddo", false, true);
             assert_eq!(program.run(), "&#32;0&#32;");
         }
 
         #[rstest]
         fn hello_world_ascii(code: String) {
-            let mut program = Program::new(code, "iiisdsiiiiiiiioiiiiiiiiiiiiiiiiiiiiiiiiiiiiioiiiiiiiooiiiodddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddoddddddddddddodddddddddddddddddddddsddoddddddddoiiioddddddoddddddddodddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddo", false, true);
+            let mut program = Chicken::new(code, "iiisdsiiiiiiiioiiiiiiiiiiiiiiiiiiiiiiiiiiiiioiiiiiiiooiiiodddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddoddddddddddddodddddddddddddddddddddsddoddddddddoiiioddddddoddddddddodddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddo", false, true);
             assert_eq!(program.run(), "&#32;72&#32;101&#32;108&#32;108&#32;111&#32;44&#32;32&#32;119&#32;111&#32;114&#32;108&#32;100&#32;33&#32;");
         }
     }
@@ -517,19 +517,19 @@ mod tests {
 
         #[rstest]
         fn no_input(code: String) {     
-            let mut program = Program::new(code, "", false, false);
+            let mut program = Chicken::new(code, "", false, false);
             assert_eq!(program.run(), "");
         }
 
         #[rstest]
         fn with_string(code: String) {     
-            let mut program = Program::new(code, "asdf", false, false);
+            let mut program = Chicken::new(code, "asdf", false, false);
             assert_eq!(program.run(), "fdsa");
         }
 
         #[rstest]
         fn with_numbers(code: String) {     
-            let mut program = Program::new(code, "1234", false, false);
+            let mut program = Chicken::new(code, "1234", false, false);
             assert_eq!(program.run(), "4321");
         }
     }

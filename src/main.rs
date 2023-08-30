@@ -61,7 +61,7 @@ fn main() {
     };
     let result = match read_result {
         Ok(_) => {
-            let mut program = Program::new(buffer, optional_input.as_str(), debug_mode, backwards_compatible);
+            let mut program = Chicken::new(buffer, optional_input.as_str(), debug_mode, backwards_compatible);
             program.run()
         },
         Err(_) => panic!("Error reading file")
