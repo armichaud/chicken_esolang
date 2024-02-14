@@ -195,7 +195,7 @@ impl Chicken {
             println!(
                 "Resulting Data Stack: {:?}", 
                 if let Some(data) = self.stack.get(self.data_stack_index..) {
-                    data.clone().into_iter().map(|token| 
+                    data.into_iter().map(|token| 
                         match token {
                             Token::Chars(s) => s.clone(),
                             Token::Num(n) => n.to_string(),
@@ -534,3 +534,6 @@ mod tests {
         }
     }
 }
+
+
+// | 0 "input" 1 6 1 
